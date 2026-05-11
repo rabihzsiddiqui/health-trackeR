@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Newsreader, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import PwaUpdater from "@/components/PwaUpdater";
 
 const newsreader = Newsreader({
   variable: "--font-newsreader",
@@ -25,8 +26,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Symptom Tracker",
-  description: "Log how you feel in under five seconds.",
+  title: "nuRa",
+  description: "log how you feel in under five seconds",
+  appleWebApp: {
+    capable: true,
+    title: "nuRa",
+    statusBarStyle: "default",
+  },
+  icons: {
+    apple: "/icons/icon-192.png",
+  },
 };
 
 export default function RootLayout({
@@ -39,7 +48,10 @@ export default function RootLayout({
       lang="en"
       className={`${newsreader.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <PwaUpdater />
+      </body>
     </html>
   );
 }

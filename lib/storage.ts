@@ -32,7 +32,10 @@ export function loadSettings(): AppSettings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return DEFAULT_SETTINGS;
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } as AppSettings;
+    const saved = { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } as AppSettings;
+    const validScales = [0.9, 1, 1.1];
+    if (!validScales.includes(saved.textScale)) saved.textScale = 1;
+    return saved;
   } catch {
     return DEFAULT_SETTINGS;
   }

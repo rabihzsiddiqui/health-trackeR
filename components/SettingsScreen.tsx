@@ -60,8 +60,7 @@ export default function SettingsScreen({
             options={[
               { v: 0.9, label: "S" },
               { v: 1, label: "M" },
-              { v: 1.15, label: "L" },
-              { v: 1.3, label: "XL" },
+              { v: 1.1, label: "L" },
             ]}
             value={settings.textScale}
             onChange={(v) => onUpdate({ textScale: v })}

@@ -1,8 +1,15 @@
 "use client";
 
-import type { ThemePalette, CbMode, AppSettings } from "@/lib/types";
+import type { ThemePalette, CbMode, AppSettings, DarkModeAuto } from "@/lib/types";
 import { fontDisplay, fontBody, getSevStyle } from "@/lib/theme";
 import SevDots from "./SevDots";
+
+function fmt(t: string): string {
+  const [h, m] = t.split(":").map(Number);
+  const period = h < 12 ? "am" : "pm";
+  const hour = h % 12 || 12;
+  return m === 0 ? `${hour}${period}` : `${hour}:${String(m).padStart(2, "0")}${period}`;
+}
 
 interface SettingsScreenProps {
   settings: AppSettings;
@@ -47,13 +54,7 @@ export default function SettingsScreen({
 
         <SectionLabel p={p}>APPEARANCE</SectionLabel>
 
-        <Row p={p} label="Dark mode" sub="Warm umber and peach. Easy on tired eyes.">
-          <Toggle
-            on={settings.darkMode}
-            onChange={(v) => onUpdate({ darkMode: v })}
-            p={p}
-          />
-        </Row>
+        <DarkModeSection settings={settings} onUpdate={onUpdate} p={p} />
 
         <Row p={p} label="Text size" sub="Larger if reading is hard right now.">
           <Segmented
@@ -204,55 +205,16 @@ function Row({
   );
 }
 
-function Toggle({
-  on,
-  onChange,
-  p,
-}: {
-  on: boolean;
-  onChange: (v: boolean) => void;
-  p: ThemePalette;
-}) {
-  return (
-    <button
-      onClick={() => onChange(!on)}
-      style={{
-        width: 52,
-        height: 30,
-        borderRadius: 99,
-        padding: 3,
-        background: on ? p.accent : p.surfaceAlt,
-        border: `1px solid ${p.border}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: on ? "flex-end" : "flex-start",
-        cursor: "pointer",
-        transition: "all 200ms ease",
-        flexShrink: 0,
-      }}
-    >
-      <div
-        style={{
-          width: 22,
-          height: 22,
-          borderRadius: 99,
-          background: on ? "#fff" : p.ink,
-          transition: "all 200ms ease",
-        }}
-      />
-    </button>
-  );
-}
 
-function Segmented({
+function Segmented<T extends string | number>({
   options,
   value,
   onChange,
   p,
 }: {
-  options: { v: number; label: string }[];
-  value: number;
-  onChange: (v: number) => void;
+  options: { v: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
   p: ThemePalette;
 }) {
   return (
@@ -290,6 +252,140 @@ function Segmented({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function DarkModeSection({
+  settings,
+  onUpdate,
+  p,
+}: {
+  settings: AppSettings;
+  onUpdate: (patch: Partial<AppSettings>) => void;
+  p: ThemePalette;
+}) {
+  const isAuto = settings.darkModeAuto !== "off";
+  const isCustom = settings.darkModeAuto === "custom";
+  const modeKey: string = isAuto ? "auto" : settings.darkMode ? "dark" : "light";
+
+  const handleMode = (v: string) => {
+    if (v === "light") onUpdate({ darkMode: false, darkModeAuto: "off" });
+    else if (v === "dark") onUpdate({ darkMode: true, darkModeAuto: "off" });
+    else onUpdate({ darkModeAuto: settings.darkModeAuto === "off" ? "default" : settings.darkModeAuto });
+  };
+
+  const sub = isCustom
+    ? `Switches at ${fmt(settings.darkModeStart)}, off at ${fmt(settings.darkModeEnd)}.`
+    : isAuto
+    ? "Switches at 8pm, off at 7am."
+    : settings.darkMode
+    ? "Currently dark."
+    : "Currently light.";
+
+  return (
+    <>
+      <Row p={p} label="Dark mode" sub={sub}>
+        <Segmented
+          options={[
+            { v: "light", label: "Light" },
+            { v: "dark",  label: "Dark"  },
+            { v: "auto",  label: "Auto"  },
+          ]}
+          value={modeKey}
+          onChange={handleMode}
+          p={p}
+        />
+      </Row>
+
+      {isAuto && (
+        <Row p={p} label="Schedule" sub="When dark mode activates.">
+          <Segmented
+            options={[
+              { v: "default", label: "8pm–7am" },
+              { v: "custom",  label: "Custom"  },
+            ]}
+            value={isCustom ? "custom" : "default"}
+            onChange={(v) => onUpdate({ darkModeAuto: v as DarkModeAuto })}
+            p={p}
+          />
+        </Row>
+      )}
+
+      {isCustom && (
+        <>
+          <TimeRow
+            label="Turn dark at"
+            value={settings.darkModeStart}
+            onChange={(v) => onUpdate({ darkModeStart: v })}
+            p={p}
+          />
+          <TimeRow
+            label="Turn light at"
+            value={settings.darkModeEnd}
+            onChange={(v) => onUpdate({ darkModeEnd: v })}
+            p={p}
+          />
+        </>
+      )}
+    </>
+  );
+}
+
+function TimeRow({
+  label,
+  value,
+  onChange,
+  p,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  p: ThemePalette;
+}) {
+  return (
+    <div
+      style={{
+        background: p.surface,
+        borderRadius: 18,
+        padding: "14px 16px",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginBottom: 10,
+        border: `1px solid ${p.border}`,
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          fontFamily: fontDisplay,
+          fontSize: 17,
+          fontWeight: 500,
+          color: p.ink,
+          letterSpacing: -0.2,
+        }}
+      >
+        {label}
+      </div>
+      <input
+        type="time"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          background: p.surfaceAlt,
+          border: `1px solid ${p.border}`,
+          borderRadius: 10,
+          padding: "7px 10px",
+          color: p.ink,
+          fontFamily: fontBody,
+          fontSize: 14,
+          fontWeight: 500,
+          cursor: "pointer",
+          outline: "none",
+          colorScheme: "inherit",
+        }}
+      />
     </div>
   );
 }

@@ -57,8 +57,13 @@ export interface SevStyle {
   dotColor: string;
 }
 
+export type DarkModeAuto = "off" | "default" | "custom";
+
 export interface AppSettings {
   darkMode: boolean;
+  darkModeAuto: DarkModeAuto;
+  darkModeStart: string;
+  darkModeEnd: string;
   cbMode: CbMode;
   textScale: number;
   warmth: number;

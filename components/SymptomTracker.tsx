@@ -2,6 +2,18 @@
 
 import { useState, useEffect, useMemo } from "react";
 import type { Screen, AppSettings, SeverityLevel } from "@/lib/types";
+
+function computeDark(s: AppSettings, now: Date): boolean {
+  if (s.darkModeAuto === "off") return s.darkMode;
+  const start = s.darkModeAuto === "custom" ? s.darkModeStart : "20:00";
+  const end   = s.darkModeAuto === "custom" ? s.darkModeEnd   : "07:00";
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const sv = sh * 60 + sm;
+  const ev = eh * 60 + em;
+  return sv > ev ? (cur >= sv || cur < ev) : (cur >= sv && cur < ev);
+}
 import { getPalette, applyWarmth, fontBody } from "@/lib/theme";
 import { loadSettings, saveSettings } from "@/lib/storage";
 import { logSymptom } from "@/lib/db/queries";
@@ -16,16 +28,25 @@ export default function SymptomTracker() {
   const [screen, setScreen] = useState<Screen>("log");
   const [modalSid, setModalSid] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
     saveSettings(settings);
   }, [settings]);
 
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   const updateSettings = (patch: Partial<AppSettings>) => {
     setSettings((prev) => ({ ...prev, ...patch }));
   };
 
-  const dark = settings.darkMode;
+  const dark = useMemo(
+    () => computeDark(settings, now),
+    [settings, now]
+  );
   const basePalette = getPalette(dark);
   const p = useMemo(
     () => applyWarmth(basePalette, settings.warmth, dark),

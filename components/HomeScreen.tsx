@@ -59,7 +59,7 @@ export default function HomeScreen({ onOpenModal, dark, p, savedFlash }: HomeScr
             gap: 12,
           }}
         >
-          {symptoms.map((s) => (
+          {symptoms.map((s, i) => (
             <SymptomTile
               key={s.id}
               id={s.id}
@@ -67,6 +67,7 @@ export default function HomeScreen({ onOpenModal, dark, p, savedFlash }: HomeScr
               onClick={() => onOpenModal(s.id)}
               dark={dark}
               p={p}
+              index={i}
             />
           ))}
         </div>
@@ -121,17 +122,23 @@ function SymptomTile({
   onClick,
   dark,
   p,
+  index,
 }: {
   id: string;
   label: string;
   onClick: () => void;
   dark: boolean;
   p: ThemePalette;
+  index: number;
 }) {
   const [pressed, setPressed] = useState(false);
   const tone = p.tileTones[id] ?? { bg: p.surfaceAlt, ink: p.ink };
 
   return (
+    <div
+      className="tile-in"
+      style={{ animationDelay: `${index * 55}ms` }}
+    >
     <button
       onClick={onClick}
       onPointerDown={() => setPressed(true)}
@@ -182,5 +189,6 @@ function SymptomTile({
         {label}
       </div>
     </button>
+    </div>
   );
 }

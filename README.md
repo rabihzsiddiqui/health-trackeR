@@ -62,11 +62,11 @@ What's done:
 - [x] Month calendar view for spotting patterns
 - [x] Local IndexedDB persistence
 - [x] Accessibility-conscious design (shape + luminance for severity, no red/green reliance)
+- [x] PWA install (manifest, service worker, icons)
+- [x] Settings panel: dark mode, severity visuals, text size, warmth
 
 What's next:
 
-- [ ] PWA install (manifest, service worker, icons)
-- [ ] Settings panel: dark mode, severity visuals, text size, warmth
 - [ ] Medication entry UI with manual next-dose reminders
 - [ ] Custom symptom management (add, rename, reorder, archive)
 - [ ] CSV / PDF export for doctor visits

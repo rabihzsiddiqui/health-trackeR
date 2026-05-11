@@ -4,7 +4,7 @@ A gentle symptom tracker for when your body is trying to tell you something.
 
 ## The story
 
-This started with a stomach ache.
+This all started with many horrible stomach aches. At some point, I had enough.
 
 The dull pain lasted for hours, and at some point it occurred to me I had no idea when the pain had started, what I had eaten that could've caused it, or whether I'd already taken anything for it. By the time I thought to write it down, the details were already fuzzy. Was it food poisoning from the chicken? Potential cross-contamination with sesame, which I am deathly allergic to? Something I caught? I didn't know, because I had nothing written down.
 

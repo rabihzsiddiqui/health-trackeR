@@ -34,7 +34,10 @@ A local-first progressive web app you can add to your home screen.
 - **Dexie.js** as the IndexedDB wrapper for local storage
 - **TypeScript** throughout
 - No backend, no analytics, no third-party network calls
-- Designed in Claude Design, wired up with Claude Code
+
+## Installing it on your phone
+
+On your phone, open the URL in Safari (iOS) or Chrome (Android) and choose **Add to Home Screen**. It will live as an icon next to your other apps.
 
 ## Running it locally
 
@@ -44,10 +47,6 @@ npm run dev
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
-
-## Installing it on your phone
-
-Deploy the app somewhere with HTTPS (Vercel is the easy path). On your phone, open the URL in Safari (iOS) or Chrome (Android) and choose **Add to Home Screen**. It will live as an icon next to your other apps.
 
 ## A note on the medication side
 

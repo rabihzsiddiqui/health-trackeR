@@ -54,66 +54,81 @@ export default function SymptomTracker() {
     await logSymptom({ symptomId: sid, severity: sev, note: note || undefined });
   };
 
+  const ts = settings.textScale;
+
   return (
     <div
       style={{
         position: "fixed",
         inset: 0,
         background: p.bg,
-        color: p.ink,
-        fontFamily: fontBody,
-        fontSize: 16 * settings.textScale,
         overflow: "hidden",
       }}
     >
       <div
         style={{
           position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          background: p.wash,
+          top: 0,
+          left: 0,
+          width: `${100 / ts}%`,
+          height: `${100 / ts}%`,
+          transform: `scale(${ts})`,
+          transformOrigin: "top left",
+          background: p.bg,
+          color: p.ink,
+          fontFamily: fontBody,
+          overflow: "hidden",
         }}
-      />
-      {screen === "log" && (
-        <HomeScreen
-          onOpenModal={openModal}
-          dark={dark}
-          p={p}
-          savedFlash={savedFlash}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            background: p.wash,
+          }}
         />
-      )}
-      {screen === "timeline" && (
-        <TimelineScreen
+        {screen === "log" && (
+          <HomeScreen
+            onOpenModal={openModal}
+            dark={dark}
+            p={p}
+            savedFlash={savedFlash}
+          />
+        )}
+        {screen === "timeline" && (
+          <TimelineScreen
+            dark={dark}
+            p={p}
+            cbMode={settings.cbMode}
+          />
+        )}
+        {screen === "settings" && (
+          <SettingsScreen
+            settings={settings}
+            onUpdate={updateSettings}
+            dark={dark}
+            p={p}
+          />
+        )}
+
+        <ModalSheet
+          open={!!modalSid}
+          sid={modalSid}
           dark={dark}
           p={p}
           cbMode={settings.cbMode}
+          onClose={closeModal}
+          onSave={saveEntry}
         />
-      )}
-      {screen === "settings" && (
-        <SettingsScreen
-          settings={settings}
-          onUpdate={updateSettings}
+
+        <TabBar
+          screen={screen}
+          setScreen={setScreen}
           dark={dark}
           p={p}
         />
-      )}
-
-      <ModalSheet
-        open={!!modalSid}
-        sid={modalSid}
-        dark={dark}
-        p={p}
-        cbMode={settings.cbMode}
-        onClose={closeModal}
-        onSave={saveEntry}
-      />
-
-      <TabBar
-        screen={screen}
-        setScreen={setScreen}
-        dark={dark}
-        p={p}
-      />
+      </div>
     </div>
   );
 }

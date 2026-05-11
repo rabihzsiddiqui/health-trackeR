@@ -64,6 +64,19 @@ const darkPalette: ThemePalette = {
   },
 };
 
+const sevPatterns = {
+  light: {
+    mild:     { bg: "#c5dff8", ink: "#1e4d8c", solid: "#2d72d2", solidInk: "#fff" },
+    bad:      { bg: "#f5edcc", ink: "#7a5a1f", solid: "#d4a820", solidInk: "#3a2e10" },
+    terrible: { bg: "#e8d4f5", ink: "#6b21a8", solid: "#8b34c9", solidInk: "#fff" },
+  } as Record<SeverityLevel, { bg: string; ink: string; solid: string; solidInk: string }>,
+  dark: {
+    mild:     { bg: "#1a3558", ink: "#82bef7", solid: "#2d72d2", solidInk: "#fff" },
+    bad:      { bg: "#3a2a10", ink: "#f0b468", solid: "#c49a18", solidInk: "#0a0800" },
+    terrible: { bg: "#2d1a42", ink: "#bf80f0", solid: "#8b34c9", solidInk: "#fff" },
+  } as Record<SeverityLevel, { bg: string; ink: string; solid: string; solidInk: string }>,
+};
+
 const sevHC = {
   light: {
     mild:     { bg: "#ffffff", ink: "#2a3528", solid: "#2a3528", solidInk: "#fff",     border: "#2a3528" },
@@ -95,7 +108,9 @@ export function getSevStyle({
   const palette =
     cbMode === "highcontrast"
       ? dark ? sevHC.dark : sevHC.light
-      : dark ? darkPalette.sev : lightPalette.sev;
+      : cbMode === "patterns"
+        ? dark ? sevPatterns.dark : sevPatterns.light
+        : dark ? darkPalette.sev : lightPalette.sev;
 
   const p = palette[level];
   const showDots = cbMode === "patterns" || cbMode === "highcontrast";
@@ -122,14 +137,22 @@ export function getSevStyle({
 export function applyWarmth(palette: ThemePalette, warmth: number, dark: boolean): ThemePalette {
   if (warmth === 1) return palette;
   const cooler = warmth < 1;
-  return {
-    ...palette,
-    wash: dark
-      ? cooler
-        ? "radial-gradient(ellipse 60% 50% at 80% -10%, rgba(160,170,200,0.10), transparent 65%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(200,210,220,0.06), transparent 60%)"
-        : "radial-gradient(ellipse 60% 50% at 80% -10%, rgba(240,141,104,0.26), transparent 65%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(240,168,104,0.18), transparent 60%)"
-      : cooler
-        ? "radial-gradient(ellipse 60% 40% at 80% -10%, rgba(91,117,142,0.10), transparent 60%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(180,200,210,0.16), transparent 60%)"
-        : "radial-gradient(ellipse 60% 40% at 80% -10%, rgba(184,119,90,0.14), transparent 60%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(232,200,96,0.28), transparent 60%)",
-  };
+
+  const colorShift = dark
+    ? cooler
+      ? { bg: "#181c24", surface: "#20242e", surfaceAlt: "#282e3a" }
+      : { bg: "#2e1510", surface: "#3e2018", surfaceAlt: "#4e2a22" }
+    : cooler
+      ? { bg: "#e8eef4", surface: "#f4f7fa", surfaceAlt: "#dde5ec" }
+      : { bg: "#f8e2cc", surface: "#fff5ec", surfaceAlt: "#f0d8c0" };
+
+  const wash = dark
+    ? cooler
+      ? "radial-gradient(ellipse 60% 50% at 80% -10%, rgba(140,160,200,0.18), transparent 65%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(170,190,220,0.12), transparent 60%)"
+      : "radial-gradient(ellipse 60% 50% at 80% -10%, rgba(240,141,104,0.30), transparent 65%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(240,168,104,0.22), transparent 60%)"
+    : cooler
+      ? "radial-gradient(ellipse 60% 40% at 80% -10%, rgba(91,130,170,0.18), transparent 60%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(150,190,210,0.22), transparent 60%)"
+      : "radial-gradient(ellipse 60% 40% at 80% -10%, rgba(200,110,60,0.18), transparent 60%), radial-gradient(ellipse 70% 50% at -10% 95%, rgba(232,180,80,0.30), transparent 60%)";
+
+  return { ...palette, ...colorShift, wash };
 }

@@ -82,7 +82,7 @@ export default function SettingsScreen({
           />
         </Row>
 
-        <SectionLabel p={p}>ACCESSIBILITY - SEVERITY VISUALS</SectionLabel>
+        <SectionLabel p={p}>ACCESSIBILITY</SectionLabel>
 
         {([
           {
@@ -93,7 +93,7 @@ export default function SettingsScreen({
           {
             id: "patterns",
             title: "Color + dots",
-            sub: "Adds a 1/2/3 dot indicator. Recommended for red-green deficiency.",
+            sub: "Blue, amber, purple palette with dot indicators. Safe for red-green CVD.",
           },
           {
             id: "highcontrast",

@@ -21,6 +21,17 @@ export async function deleteSymptomEntry(id: string): Promise<void> {
   await db.symptomEntries.delete(id);
 }
 
+export async function updateSymptomNote(id: string, note: string | undefined): Promise<void> {
+  await db.symptomEntries.update(id, { note });
+}
+
+export async function clearAllData(): Promise<void> {
+  await Promise.all([
+    db.symptomEntries.clear(),
+    db.medicationEntries.clear(),
+  ]);
+}
+
 export async function logMedication(data: {
   medicationId: string;
   dose: string;

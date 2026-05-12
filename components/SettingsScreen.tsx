@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { ThemePalette, CbMode, AppSettings, DarkModeAuto } from "@/lib/types";
 import { fontDisplay, fontBody, getSevStyle } from "@/lib/theme";
 import SevDots from "./SevDots";
@@ -16,6 +17,7 @@ interface SettingsScreenProps {
   onUpdate: (patch: Partial<AppSettings>) => void;
   dark: boolean;
   p: ThemePalette;
+  onClearAll: () => Promise<void>;
 }
 
 export default function SettingsScreen({
@@ -23,7 +25,9 @@ export default function SettingsScreen({
   onUpdate,
   dark,
   p,
+  onClearAll,
 }: SettingsScreenProps) {
+  const [confirmingClear, setConfirmingClear] = useState(false);
   return (
     <div
       style={{
@@ -129,6 +133,115 @@ export default function SettingsScreen({
         >
           Data stays on this device. No account. No sharing.
         </div>
+
+        <SectionLabel p={p}>DATA</SectionLabel>
+
+        {confirmingClear ? (
+          <div
+            style={{
+              background: p.surface,
+              borderRadius: 18,
+              padding: "16px 18px",
+              border: `1px solid rgba(220,60,50,0.35)`,
+              marginBottom: 10,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: fontDisplay,
+                fontSize: 16,
+                fontWeight: 500,
+                color: p.ink,
+                marginBottom: 4,
+              }}
+            >
+              Delete all entries?
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                color: p.inkSoft,
+                marginBottom: 14,
+                lineHeight: 1.4,
+              }}
+            >
+              This removes every logged symptom and medication entry. Settings stay. Cannot be undone.
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={() => setConfirmingClear(false)}
+                style={{
+                  flex: 1,
+                  height: 46,
+                  borderRadius: 14,
+                  background: "transparent",
+                  border: `1px solid ${p.borderStrong}`,
+                  fontFamily: fontDisplay,
+                  fontSize: 16,
+                  color: p.inkSoft,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  await onClearAll();
+                  setConfirmingClear(false);
+                }}
+                style={{
+                  flex: 1,
+                  height: 46,
+                  borderRadius: 14,
+                  background: "rgba(220,60,50,0.12)",
+                  border: `1px solid rgba(220,60,50,0.35)`,
+                  fontFamily: fontDisplay,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: "#e05548",
+                  cursor: "pointer",
+                }}
+              >
+                Delete everything
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmingClear(true)}
+            style={{
+              width: "100%",
+              textAlign: "left",
+              background: p.surface,
+              borderRadius: 18,
+              padding: "14px 18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 10,
+              border: `1px solid ${p.border}`,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontFamily: fontDisplay,
+                  fontSize: 18,
+                  fontWeight: 500,
+                  color: "#e05548",
+                  letterSpacing: -0.2,
+                }}
+              >
+                Reset all data
+              </div>
+              <div style={{ fontSize: 12, color: p.inkSoft, marginTop: 3 }}>
+                Clears every logged entry. Settings stay.
+              </div>
+            </div>
+          </button>
+        )}
       </div>
     </div>
   );

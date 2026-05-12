@@ -46,6 +46,12 @@ export default function Icon({ name, size = 28, stroke = 2, color = "currentColo
       return <svg {...s}><path d="M15 18l-6-6 6-6" /></svg>;
     case "chevron-right":
       return <svg {...s}><path d="M9 6l6 6-6 6" /></svg>;
+    case "pencil":
+      return <svg {...s}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z" /></svg>;
+    case "trash":
+      return <svg {...s}><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" /></svg>;
+    case "check":
+      return <svg {...s}><path d="M20 6L9 17l-5-5" /></svg>;
     default:
       return null;
   }

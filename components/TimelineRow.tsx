@@ -1,7 +1,11 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import type { ThemePalette, CbMode } from "@/lib/types";
 import type { SymptomEntry } from "@/lib/db/types";
 import { fontDisplay, fontMono, getSevStyle } from "@/lib/theme";
 import { SYMPTOM_BY_ID, SEV_LABELS } from "@/lib/symptoms";
+import { deleteSymptomEntry } from "@/lib/db/queries";
 import Icon from "./Icon";
 import SevDots from "./SevDots";
 
@@ -10,9 +14,10 @@ interface TimelineRowProps {
   dark: boolean;
   p: ThemePalette;
   cbMode: CbMode;
+  onEdit: (entry: SymptomEntry) => void;
 }
 
-export default function TimelineRow({ e, dark, p, cbMode }: TimelineRowProps) {
+export default function TimelineRow({ e, dark, p, cbMode, onEdit }: TimelineRowProps) {
   const s = SYMPTOM_BY_ID[e.symptomId];
   const tone = p.tileTones[e.symptomId] ?? { bg: p.surfaceAlt, ink: p.ink };
   const sev = getSevStyle({ level: e.severity, dark, cbMode, variant: "button" });
@@ -20,6 +25,19 @@ export default function TimelineRow({ e, dark, p, cbMode }: TimelineRowProps) {
     hour: "numeric",
     minute: "2-digit",
   });
+
+  const [confirming, setConfirming] = useState(false);
+
+  useEffect(() => {
+    if (!confirming) return;
+    const t = setTimeout(() => setConfirming(false), 2500);
+    return () => clearTimeout(t);
+  }, [confirming]);
+
+  const handleDelete = async () => {
+    await deleteSymptomEntry(e.id);
+    setConfirming(false);
+  };
 
   return (
     <div
@@ -103,18 +121,79 @@ export default function TimelineRow({ e, dark, p, cbMode }: TimelineRowProps) {
         )}
       </div>
 
-      {/* time */}
+      {/* right: time + actions */}
       <div
         style={{
-          fontSize: 12,
-          color: p.inkFaint,
-          fontFamily: fontMono,
-          fontVariantNumeric: "tabular-nums",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          gap: 8,
           flexShrink: 0,
         }}
       >
-        {time}
+        <div
+          style={{
+            fontSize: 12,
+            color: p.inkFaint,
+            fontFamily: fontMono,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {time}
+        </div>
+
+        {confirming ? (
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={() => setConfirming(false)}
+              style={actionBtn(p.surfaceAlt, p.inkSoft)}
+              aria-label="cancel delete"
+            >
+              <Icon name="x" size={13} stroke={2.2} color={p.inkSoft} />
+            </button>
+            <button
+              onClick={handleDelete}
+              style={actionBtn("rgba(220,60,50,0.15)", "#e05548")}
+              aria-label="confirm delete"
+            >
+              <Icon name="trash" size={13} stroke={2} color="#e05548" />
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={() => onEdit(e)}
+              style={actionBtn(p.surfaceAlt, p.inkFaint)}
+              aria-label="edit note"
+            >
+              <Icon name="pencil" size={13} stroke={2} color={p.inkFaint} />
+            </button>
+            <button
+              onClick={() => setConfirming(true)}
+              style={actionBtn(p.surfaceAlt, p.inkFaint)}
+              aria-label="delete entry"
+            >
+              <Icon name="trash" size={13} stroke={2} color={p.inkFaint} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+function actionBtn(bg: string, color: string): React.CSSProperties {
+  return {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    background: bg,
+    border: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    color,
+    padding: 0,
+  };
 }

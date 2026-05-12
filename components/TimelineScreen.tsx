@@ -8,6 +8,7 @@ import { fontDisplay, fontMono } from "@/lib/theme";
 import { db } from "@/lib/db/database";
 import TimelineRow from "./TimelineRow";
 import CalendarView from "./CalendarView";
+import EditNoteSheet from "./EditNoteSheet";
 
 interface TimelineScreenProps {
   dark: boolean;
@@ -45,6 +46,7 @@ function dayDate(key: string): string {
 
 export default function TimelineScreen({ dark, p, cbMode }: TimelineScreenProps) {
   const [view, setView] = useState<TimelineView>("day");
+  const [editEntry, setEditEntry] = useState<SymptomEntry | null>(null);
 
   const entries =
     useLiveQuery(() => db.symptomEntries.orderBy("occurredAt").reverse().toArray(), []) ?? [];
@@ -60,6 +62,7 @@ export default function TimelineScreen({ dark, p, cbMode }: TimelineScreenProps)
   const dayKeys = Object.keys(grouped);
 
   return (
+    <>
     <div
       style={{
         position: "absolute",
@@ -138,7 +141,7 @@ export default function TimelineScreen({ dark, p, cbMode }: TimelineScreenProps)
         </div>
 
         {view === "month" && (
-          <CalendarView entries={entries} dark={dark} p={p} cbMode={cbMode} />
+          <CalendarView entries={entries} dark={dark} p={p} cbMode={cbMode} onEdit={setEditEntry} />
         )}
 
         {view === "day" &&
@@ -182,6 +185,7 @@ export default function TimelineScreen({ dark, p, cbMode }: TimelineScreenProps)
                     dark={dark}
                     p={p}
                     cbMode={cbMode}
+                    onEdit={setEditEntry}
                   />
                 ))}
               </div>
@@ -189,5 +193,12 @@ export default function TimelineScreen({ dark, p, cbMode }: TimelineScreenProps)
           ))}
       </div>
     </div>
+    <EditNoteSheet
+      entry={editEntry}
+      dark={dark}
+      p={p}
+      onClose={() => setEditEntry(null)}
+    />
+    </>
   );
 }

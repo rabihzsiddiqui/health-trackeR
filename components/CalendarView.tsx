@@ -11,6 +11,7 @@ interface CalendarViewProps {
   dark: boolean;
   p: ThemePalette;
   cbMode: CbMode;
+  onEdit: (entry: SymptomEntry) => void;
 }
 
 function ymd(d: Date): string {
@@ -40,6 +41,7 @@ export default function CalendarView({
   dark,
   p,
   cbMode,
+  onEdit,
 }: CalendarViewProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -265,7 +267,7 @@ export default function CalendarView({
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {selectedDayEntries.map((e) => (
-              <TimelineRow key={e.id} e={e} dark={dark} p={p} cbMode={cbMode} />
+              <TimelineRow key={e.id} e={e} dark={dark} p={p} cbMode={cbMode} onEdit={onEdit} />
             ))}
           </div>
         )}

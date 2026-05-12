@@ -16,7 +16,7 @@ function computeDark(s: AppSettings, now: Date): boolean {
 }
 import { getPalette, applyWarmth, fontBody } from "@/lib/theme";
 import { loadSettings, saveSettings } from "@/lib/storage";
-import { logSymptom } from "@/lib/db/queries";
+import { logSymptom, clearAllData } from "@/lib/db/queries";
 import TabBar from "./TabBar";
 import HomeScreen from "./HomeScreen";
 import ModalSheet from "./ModalSheet";
@@ -130,6 +130,7 @@ export default function SymptomTracker() {
             onUpdate={updateSettings}
             dark={dark}
             p={p}
+            onClearAll={clearAllData}
           />
         )}
 
